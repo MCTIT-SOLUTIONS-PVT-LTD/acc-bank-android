@@ -31,6 +31,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
@@ -43,7 +44,7 @@ import androidx.compose.ui.unit.sp
 @Composable
 fun registration()
 {
-    var email by remember { mutableStateOf("") }
+    var username by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var passwordVisible by remember { mutableStateOf(false) }
     var confirmPassword by remember { mutableStateOf("") }
@@ -69,10 +70,18 @@ fun registration()
                 .padding(20.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
+            Text(
+                text = "Registration",
+                fontSize = 24.sp,
+                fontWeight = FontWeight.Bold,
+                fontFamily = FontFamily.SansSerif,
+                color = Color.White,
+                modifier = Modifier.padding(16.dp)
+            )
             //  Glassmorphic Email Field
             OutlinedTextField(
-                value = email,
-                onValueChange = { email = it },
+                value = username,
+                onValueChange = { username = it },
                 label = { Text("User ID/username") },
                 singleLine = true,
                 shape = RoundedCornerShape(24.dp),
@@ -170,13 +179,18 @@ fun registration()
 
             Button(
                 onClick = {
-                    if (password.isEmpty() || confirmPassword.isEmpty()) {
-                        errorMessage = "password cannot be empty"
-                     } else if (password != confirmPassword) {
-                         errorMessage = "password and Confirm password do not match"
+                    if (username.isEmpty()) {
+                        errorMessage = "Email cannot be empty"
+                    } else if (password.isEmpty() || confirmPassword.isEmpty()) {
+                        errorMessage = "Password cannot be empty"
+                    } else if (password != confirmPassword) {
+                        errorMessage = "Password and Confirm password do not match"
+                    } else if (!isValidPassword(password)) {
+                        errorMessage = "Password must be at least 10 characters, with 1 letter, 1 special character, 1 number, 1 uppercase, and 1 lowercase"
                     } else {
                         errorMessage = "" // Clear error when valid
-                        // Proceed with submission
+
+                        // Proceed with registration
                     }
                           },
                 modifier = Modifier
@@ -198,4 +212,13 @@ fun registration()
             )*/
         }
     }
+}
+// Password validation function
+fun isValidPassword(password: String): Boolean {
+    val regex = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[!@#\$%^&*()_+\\-=\\[\\]{};':\"\\\\|,.<>/?])[A-Za-z\\d!@#\$%^&*()_+\\-=\\[\\]{};':\"\\\\|,.<>/?]{10,}\$".toRegex()
+    return password.matches(regex)
+}
+@Composable
+fun mobilenumber(){
+
 }
