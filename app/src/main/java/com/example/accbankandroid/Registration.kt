@@ -8,7 +8,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -42,7 +42,7 @@ import androidx.compose.ui.unit.sp
 @OptIn(ExperimentalMaterial3Api::class)
 @Preview
 @Composable
-fun registration()
+fun RegistrationScreen()
 {
     var username by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
@@ -50,6 +50,7 @@ fun registration()
     var confirmPassword by remember { mutableStateOf("") }
     var confirmPasswordVisible by remember { mutableStateOf(false) }
     var errorMessage by remember { mutableStateOf("") }
+    var isRegistered by remember { mutableStateOf(false) }
 
     // ✅ Remember scroll state for vertical scrolling
     val scrollState = rememberScrollState()
@@ -61,6 +62,7 @@ fun registration()
             .background(getGradientBrush()) // Apply new gradient
             .padding(16.dp),
         contentAlignment = Alignment.Center
+
     ){
 
         Column(
@@ -72,13 +74,17 @@ fun registration()
         ) {
             Text(
                 text = "Registration",
-                fontSize = 24.sp,
+                fontSize = 26.sp,
                 fontWeight = FontWeight.Bold,
-                fontFamily = FontFamily.SansSerif,
                 color = Color.White,
-                modifier = Modifier.padding(16.dp)
+                fontFamily = FontFamily.SansSerif,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 20.dp)
+                    .wrapContentWidth(Alignment.CenterHorizontally)
             )
-            //  Glassmorphic Email Field
+            Spacer(modifier = Modifier.height(30.dp))
+            //  Email Field
             OutlinedTextField(
                 value = username,
                 onValueChange = { username = it },
@@ -175,7 +181,7 @@ fun registration()
                 }
             }
 
-            Spacer(modifier = Modifier.height(32.dp))
+            Spacer(modifier = Modifier.height(40.dp))
 
             Button(
                 onClick = {
@@ -186,11 +192,11 @@ fun registration()
                     } else if (password != confirmPassword) {
                         errorMessage = "Password and Confirm password do not match"
                     } else if (!isValidPassword(password)) {
-                        errorMessage = "Password must be at least 10 characters, with 1 letter, 1 special character, 1 number, 1 uppercase, and 1 lowercase"
+                        errorMessage = "Password must be at least 10 characters,with 1 letter, 1 special character, 1 number, 1 uppercase, and 1 lowercase"
                     } else {
                         errorMessage = "" // Clear error when valid
+                        isRegistered = true
 
-                        // Proceed with registration
                     }
                           },
                 modifier = Modifier
@@ -202,8 +208,11 @@ fun registration()
             ) {
                 Text(text = "Register", fontSize = 18.sp, color = Color.Black)
             }
-            Spacer(modifier = Modifier.height(100.dp))
 
+            Spacer(modifier = Modifier.height(100.dp))
+            if (isRegistered) {
+                PhoneNumberInputScreen()
+            }
             /*Box(
                 modifier = Modifier
                     .width(300.dp) // Underline length
@@ -217,8 +226,4 @@ fun registration()
 fun isValidPassword(password: String): Boolean {
     val regex = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[!@#\$%^&*()_+\\-=\\[\\]{};':\"\\\\|,.<>/?])[A-Za-z\\d!@#\$%^&*()_+\\-=\\[\\]{};':\"\\\\|,.<>/?]{10,}\$".toRegex()
     return password.matches(regex)
-}
-@Composable
-fun mobilenumber(){
-
 }
