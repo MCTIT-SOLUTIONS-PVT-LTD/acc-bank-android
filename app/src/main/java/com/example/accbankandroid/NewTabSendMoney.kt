@@ -2,6 +2,7 @@ package com.example.accbankandroid
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -27,6 +28,7 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Divider
+import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
@@ -40,6 +42,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.BiasAbsoluteAlignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
@@ -66,6 +69,7 @@ fun NewTabContent() {
     var errorMessage by remember { mutableStateOf("") }
     var confirmsecurityanswer by remember { mutableStateOf("Admin@123") }
     var message by remember { mutableStateOf("") } // State to store the input text
+    var isSendButtonClicked by remember { mutableStateOf(false) } // Controls button visibility
     val minLength = 250 // Minimum length for the message
 
     val scrollState = rememberScrollState()
@@ -357,34 +361,139 @@ fun NewTabContent() {
             }
         }
         Spacer(modifier = Modifier.height(10.dp))
-        Button(
-            onClick = {
-                if (securityanswer.isEmpty() || confirmsecurityanswer.isEmpty()) {
-                    errorMessage = "Security answer cannot be empty"
-                } else if (securityanswer != confirmsecurityanswer) {
-                    errorMessage = "Answer and Confirm Answer do not match"
-                } else {
-                    errorMessage = "" // Clear error when valid
-                    // Proceed with submission
-                }
-            },
-            shape = RoundedCornerShape(20.dp), // Rounded corners
-            border = BorderStroke(1.dp, Color.White), // White border
-            colors = ButtonDefaults.buttonColors(
-                containerColor = Color.Transparent // Button background is transparent
-            ),
-            modifier = Modifier
-                .height(70.dp) // Button height
-                .width(170.dp) // Button width
-                .align(Alignment.CenterHorizontally) // Center horizontally
+        Column(
+            modifier = Modifier.fillMaxSize(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
         ) {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize() // Ensure gradient covers entire button
-                    .background(Brush.verticalGradient(listOf(Color.Cyan, Color.Blue)), shape = RoundedCornerShape(20.dp)),
-                contentAlignment = Alignment.Center // Center text
-            ) {
-                Text("✔ Send", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 18.sp,fontFamily = FontFamily.SansSerif)
+            if (!isSendButtonClicked) {
+                // Initial "✔ Send" Button
+                Button(
+                    onClick = {
+                        when {
+                            amount.isBlank() -> {
+                                errorMessage = "Amount cannot be empty"
+                            }
+                            notifyMethod.isBlank() -> {
+                                errorMessage = "Notification method cannot be empty"
+                            }
+                            securityquestion.isBlank() -> {
+                                errorMessage = "Security question cannot be empty"
+                            }
+                            securityanswer.isBlank() || confirmsecurityanswer.isBlank() -> {
+                                errorMessage = "Security answer cannot be empty"
+                            }
+                            securityanswer != confirmsecurityanswer -> {
+                                errorMessage = "Answer and Confirm Answer do not match"
+                            }
+                            else -> {
+                                errorMessage = "" // Clear errors
+                                isSendButtonClicked = true // Hide this button and show new ones
+                                // Proceed with submission logic
+                            }
+                        }
+                    },
+                    shape = RoundedCornerShape(20.dp), // Rounded corners
+                    border = BorderStroke(1.dp, Color.White), // White border
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color.Transparent // Button background is transparent
+                    ),
+                    modifier = Modifier
+                        .height(70.dp) // Button height
+                        .width(170.dp) // Button width
+                        .align(Alignment.CenterHorizontally) // Center horizontally
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize() // Ensure gradient covers entire button
+                            .background(
+                                Brush.verticalGradient(listOf(Color.Cyan, Color.Blue)),
+                                shape = RoundedCornerShape(20.dp)
+                            ),
+                        contentAlignment = Alignment.Center // Center text
+                    ) {
+                        Text(
+                            "✔ Send",
+                            color = Color.White,
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 18.sp,
+                            fontFamily = FontFamily.SansSerif
+                        )
+                    }
+                }
+            }
+            else
+            {
+                // Show "Send Now" and "Edit" buttons
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(16.dp),
+                    modifier = Modifier.align(Alignment.CenterHorizontally)
+                ) {
+                    Button(
+                        onClick = {
+                            // Send Now button action
+                        },
+                        shape = RoundedCornerShape(20.dp), // Rounded corners
+                        border = BorderStroke(1.dp, Color.White), // White border
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Color.Transparent // Button background is transparent
+                        ),
+                        modifier = Modifier
+                            .height(60.dp) // Button height
+                            .width(170.dp) // Button width
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxSize() // Ensure gradient covers entire button
+                                .background(
+                                    Brush.verticalGradient(listOf(Color.Cyan, Color.Blue)),
+                                    shape = RoundedCornerShape(20.dp)
+                                ),
+                            contentAlignment = Alignment.Center // **Ensures text is centered**
+                        ){
+                            Text(
+                                "Send Now",
+                                color = Color.White,
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 18.sp,
+                                fontFamily = FontFamily.SansSerif
+                            )
+                        }
+                    }
+
+                    Button(
+                        onClick = {
+                            isSendButtonClicked = false // Show "✔ Send" button again
+                        },
+                        shape = RoundedCornerShape(20.dp), // Rounded corners
+                        border = BorderStroke(1.dp, Color.White), // White border
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Color.Transparent // Button background is transparent
+                        ),
+                        modifier = Modifier
+                            .height(60.dp) // Button height
+                            .width(170.dp) // Button width
+                    ) {Box(
+                        modifier = Modifier
+                            .fillMaxSize() // Ensure gradient covers entire button
+                            .background(
+                                Brush.verticalGradient(listOf(Color.Cyan, Color.Blue)),
+                                shape = RoundedCornerShape(20.dp)
+                            ),
+                        contentAlignment = Alignment.Center // **Ensures text is centered**
+                    )
+                        {
+                            Text(
+                            "Edit",
+                            color = Color.White,
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 18.sp,
+                            fontFamily = FontFamily.SansSerif
+                            )
+                        }
+                    }
+                }
+
             }
         }
 
@@ -468,4 +577,95 @@ fun NotifyRecipientDropdown() {
         }
     }
 }
+@Composable
+fun contactdropdown() {
+    var selectedRecipient by remember { mutableStateOf<Contact?>(null) }
+    var expanded by remember { mutableStateOf(false) }
+    var selectedIndex by remember { mutableStateOf(0) }  // ✅ Initialize selectedIndex properly
+
+    // Mock Contact List (Replace with API or Database Fetch)
+    val contacts = listOf(
+        Contact("Sam Peter", "sam_test@gmail.com", "(416)555-1234"),
+        Contact("John Doe", "john@example.com", "123-456-7890"),
+        Contact("Jane Smith", "jane@example.com", "987-654-3210"),
+        Contact("Mike Johnson", "mike@example.com", "555-666-7777")
+    )
+
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(12.dp)
+            .background(Color.White)
+    ) {
+        // SEND TO Label
+        Text(
+            text = "SEND TO",
+            fontSize = 14.sp,
+            fontWeight = FontWeight.Medium,
+            color = Color.Gray,
+            fontFamily = FontFamily.SansSerif,
+            letterSpacing = 2.sp
+        )
+
+        Spacer(modifier = Modifier.height(5.dp))
+
+
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clickable { expanded = !expanded }
+            ,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = selectedRecipient?.name?.let { name ->
+                    val nameParts = name.split(" ")
+                    val firstName = nameParts.getOrNull(0)?.replaceFirstChar { it.uppercaseChar() } ?: ""
+                    val remainingName = nameParts.drop(1).joinToString(" ")
+                    if (remainingName.isNotEmpty()) "$firstName $remainingName" else firstName
+                } ?: "Select Recipient",
+                fontSize = 18.sp,
+                fontWeight = FontWeight.Bold,
+                fontFamily = FontFamily.SansSerif,
+                modifier = Modifier.weight(1f) // Pushes icon to the end
+
+            )
+
+            Icon(
+                imageVector = if (expanded) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
+                contentDescription = "Dropdown Icon"
+            )
+        }
+        selectedRecipient?.let {
+            Text(it.email, fontSize = 16.sp, color = Color.Gray, fontFamily = FontFamily.SansSerif)
+            Text(it.phone, fontSize = 16.sp, color = Color.Gray, fontFamily = FontFamily.SansSerif)
+        }
+
+        // Dropdown Menu for Contact Selection
+        DropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = false },
+            modifier = Modifier.background(Color.White)
+
+        ) {
+            contacts.forEach { contact ->
+                DropdownMenuItem(
+                    onClick = {
+                        selectedRecipient = contact
+                        expanded = false
+                    },
+                    text = {
+                        Column {
+                            Text(contact.name, fontSize = 18.sp, fontWeight = FontWeight.Bold, fontFamily = FontFamily.SansSerif)
+                            Text(contact.email, fontSize = 16.sp, color = Color.Gray, fontFamily = FontFamily.SansSerif)
+                            Text(contact.phone, fontSize = 16.sp, color = Color.Gray, fontFamily = FontFamily.SansSerif)
+                        }
+                    }
+                )
+            }
+        }
+    }
+}
+
+data class Contact(val name: String, val email: String, val phone: String)
 
